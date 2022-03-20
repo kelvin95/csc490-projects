@@ -23,6 +23,12 @@ Making Your Self-driving Car Perceive the World.
    conda env create --file environment.yml
    ```
 
+   To update the conda environment with new packages:
+
+   ```bash
+   conda env update --file environment.yml
+   ```
+
 5. Activate your new environment:
 
    ```bash

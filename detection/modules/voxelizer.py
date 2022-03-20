@@ -120,3 +120,29 @@ class Voxelizer(torch.nn.Module):
         scores = detections.scores[mask] if detections.scores is not None else None
 
         return Detections(centroids, yaws, boxes, scores)
+
+    def unproject_detections(self, detections: Detections) -> Detections:
+        """Unproject voxelized detections to vehicle frames.
+
+        Args:
+            detections: 2D bounding box detections, in voxel grid coordinates.
+
+        Returns:
+            2D bounding box detections, in vehicle coordinates.
+        """
+        # Transform image to vehicle coordinates
+        ix, iy = detections.centroids[:, :2].T
+        x = self._x_min + ix * self._step
+        y = self._y_max - iy * self._step
+        centroids = torch.stack([x, y], dim=1)
+
+        # Transform image lengths (pixels) to vehicle-frame relative lengths
+        boxes = detections.boxes[:, :2] * self._step
+
+        # Yaws are unchanged
+        yaws = detections.yaws
+
+        # Scores are unchanged
+        scores = detections.scores
+
+        return Detections(centroids, yaws, boxes, scores)
